@@ -1,89 +1,62 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>turoto.tr - Bilgilendirme</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            line-height: 1.6;
-            color: #2c3e50;
-            max-width: 800px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #f7f9fa;
-        }
-        .card {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-top: 5px solid #e74c3c;
-        }
-        .status-box {
-            background: #fdf3f2;
-            border: 1px solid #fadbd8;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        .status-tr {
-            font-size: 1.3em;
-            font-weight: 800;
-            color: #c0392b;
-            margin-bottom: 8px;
-        }
-        .status-en {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #7f8c8d;
-        }
-        h2 {
-            font-size: 1.2em;
-            color: #34495e;
-            margin-top: 25px;
-            margin-bottom: 10px;
-        }
-        p {
-            margin-bottom: 15px;
-            text-align: justify;
-        }
-        hr {
-            border: 0;
-            border-top: 1px solid #eee;
-            margin: 25px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yükleniyor...</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
+    h1 { color: #111; margin-bottom: 20px; }
+    .meta { font-size: 0.9em; color: #666; margin-bottom: 30px; }
+    .content { font-size: 1.1em; white-space: pre-line; }
+    .loading { text-align: center; padding: 50px; color: #888; }
+  </style>
 </head>
 <body>
+  <div id="app">
+    <div class="loading">İçerik yükleniyor...</div>
+  </div>
 
-<div class="card">
-    <div class="status-box">
-        <div class="status-tr">BU ALAN ADI SATILIK DEĞİLDİR</div>
-        <div class="status-en">THIS DOMAIN NAME IS ABSOLUTELY NOT FOR SALE.</div>
-    </div>
+  <script>
+    const SUPABASE_URL = 'https://eawwgvklwuhqsbwwcqdc.supabase.co'; // Proje URL'in
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhd3dndmtsd3VocXNid3djcWRjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk3NTU5NjcsImV4cCI6MjEwNTMzMTk2N30.sySmKTHrMxdhB7locmhUQqwjoWK2Sipqlxxqo7Slc7I'; // Anon/Public Key
 
-    <div class="section">
-        <h2>📌 Gelecek Proje Beyanı (Kâr Amacı Gütmeyen Proje)</h2>
-        <p>Bu alan adı (turoto.tr); turizm rotaları, alternatif seyahat güzergâhları, kültürel miras keşifleri ve doğa yürüyüşü parkurları konularında rehberlik ve arşiv içerikleri sunacak, tamamen kâr amacı gütmeyen bağımsız bir <strong>"Kültürel Seyahat ve Turizm Rotaları Arşivi"</strong> projesi için rezerve edilmiştir. Sitenin teknik altyapı çalışmaları sürmektedir.</p>
-    </div>
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <hr>
+    async function loadArticle() {
+      const today = new Date().toISOString().split('T')[0];
+      let domain = window.location.hostname.replace('www.', '');
 
-    <div class="section">
-        <h2>⚖️ Kesin Bağlantısızlık Beyanı (Hukuki Uyarı)</h2>
-        <p>Bu web sitesi ve alan adının; otomotiv, araç kiralama, motorlu taşıtlar, yedek parça veya benzer/aynı ismi taşıyan hiçbir ulusal veya uluslararası şirket, galeri ya da tescilli ticari marka ile hiçbir organik bağı, ortaklığı, acenteliği ya da ticari ilişkisi bulunmamaktadır. Bu adreste araç satışı yapılmaz, rent a car hizmeti verilmez ve ticari hiçbir faaliyet yürütülmez.</p>
-    </div>
+      // Yerel testlerde veya GitHub Pages alt alan adlarında varsayılan test domaini
+      if (domain === 'localhost' || domain.includes('github.io')) {
+        domain = 'riyadhair.com.tr'; 
+      }
 
-    <hr>
+      const { data, error } = await supabase
+        .from('articles')
+        .select('title, content, created_at')
+        .eq('domain', domain)
+        .order('date', { ascending: false })
+        .limit(1)
+        .maybeSingle();
 
-    <div class="section">
-        <h2>💡 Kötü Niyet Bulunmadığına Dair Taahhüt (İyi Niyet Beyanı)</h2>
-        <p>Bu alan adı, otomotiv veya araç kiralama sektöründeki markaların ticari itibarından faydalanma, haksız rekabet yaratma veya internet kullanıcılarını resmi bir taşıt/otomotiv platformuymuş gibi yanıltma amacı taşımaksızın, tamamen turizm ve seyahat terminolojisindeki kısaltmalar çerçevesinde tescil edilmiştir. Alan adı üzerinden doğrudan veya dolaylı olarak hiçbir ticari teklif, satın alma veya devir talebi kesinlikle kabul edilmeyecektir.</p>
-    </div>
-</div>
+      const appEl = document.getElementById('app');
 
+      if (error || !data) {
+        appEl.innerHTML = '<h1>İçerik Bulunamadı</h1><p>Bu alan adı için henüz yayınlanmış bir yazı bulunmuyor.</p>';
+        return;
+      }
+
+      document.title = data.title;
+      appEl.innerHTML = `
+        <h1>${data.title}</h1>
+        <div class="meta">Yayınlanma Tarihi: ${new Date(data.created_at).toLocaleDateString('tr-TR')}</div>
+        <div class="content">${data.content}</div>
+      `;
+    }
+
+    loadArticle();
+  </script>
 </body>
 </html>
